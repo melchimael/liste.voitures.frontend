@@ -1,0 +1,4 @@
+.listeVoitures{
+    display: flex;
+    flex-direction: row;
+}

@@ -1,0 +1,16 @@
+.photoVoiture{
+    max-width: 300px;
+}
+.voiture{
+    display: flex;
+    flex-direction: column;
+}
+.modele{
+    width: 188px;
+}
+.comment-shower{
+    cursor: pointer;
+}
+/* .datecomment{
+    align-self: flex-end;
+} */
