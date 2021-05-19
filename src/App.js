@@ -13,7 +13,7 @@ function App() {
     <BrowserRouter>
         <div className="containerView">
           <Nav/>
-          <Switch>
+          <Switch className="bg-dark">
               <Route exact path="/" component={ListeVoitures}></Route>
               <Route path="/inscription" component={Inscription}></Route>
           </Switch>

@@ -35,14 +35,14 @@ function Voitures() {
                 <span className="ml-2 fw-bolder">Voir les commentaires</span>
                 <Icon.ChevronDown className="ml-2"/> 
             </a>   
-            <div className="m-2 shadow p-1 rounded"> 
+            <div className="m-2 shadow p-1 rounded border"> 
                 <div className="d-flex flex-direction-row align-items-center justify-content-between">
                     <div className="d-flex flex-direction-row align-items-center"><h6>John Doe</h6><Icon.Person className="ml-1 mb-2" size={20}/></div>  
                     <p className="m-0 text-muted">2021-6-3</p>
                 </div>
                 <p className="text-justify">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
             </div>
-            <div className="m-2 shadow p-1 rounded"> 
+            <div className="m-2 shadow p-1 rounded border"> 
                 <div className="d-flex flex-direction-row align-items-center justify-content-between">
                     <div className="d-flex flex-direction-row align-items-center"><h6>John Doe</h6><Icon.Person className="ml-1 mb-2" size={20}/></div>  
                     <p className="m-0 text-muted">2021-6-3</p>

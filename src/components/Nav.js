@@ -7,7 +7,7 @@ function Nav() {
     const [showModalConnection, setshowModalConnection] = useState(false)
     const [modalInscription, setmodalInscription] = useState(false)
     return (
-        <div>
+        <div className="shadow">
            <Modal show={modalInscription} onHide={()=>setmodalInscription(false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>S'inscrire</Modal.Title>
