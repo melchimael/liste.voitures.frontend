@@ -2,10 +2,71 @@ import React, { useState } from 'react'
 import {Button, Row, Col, Container, Modal, Form} from "react-bootstrap"
 import * as Icon from 'react-bootstrap-icons';
 import './Styles/Nav.css'
+import axios from 'axios'
+import serverInfo from  './config/serverInfo'
+import { LogInStore } from './store/store';
 function Nav() {
-    const [showDeconnect, setshowDeconnect] = useState(false)
-    const [showModalConnection, setshowModalConnection] = useState(false)
+    const [loginState, setloginState] = useState(false)
+
+    const [infoInscription, setinfoInscription] = useState({nom:"",mdp:""})
+    const [isValidInscription, setisValidInscription] = useState(true)
     const [modalInscription, setmodalInscription] = useState(false)
+    
+    const [infoLogin, setinfoLogin] = useState({nom:"",mdp:""})
+    const [isValidLogin, setisValidLogin] = useState(true)
+    const [showModalConnection, setshowModalConnection] = useState(false)
+    
+    const [showDeconnect, setshowDeconnect] = useState(false)
+
+    const handleInscription = (type, value)=>{
+          setinfoInscription({...infoInscription,[type]:value})
+          // console.log(infoInscription)
+    }
+    const handleLogin = (type, value)=>{
+        setinfoLogin({...infoLogin,[type]:value})
+        // console.log(infoInscription)
+    }
+
+    const disconnect = ()=>{
+        LogInStore.dispatch({type:"MAJ",login:false});
+        axios.post(serverInfo+"/disconnect",{},{withCredentials:true}).then(response=>{
+              alert(response.data)
+              setshowDeconnect(false)
+        })
+    }
+
+    LogInStore.subscribe(()=>{
+        setloginState(LogInStore.getState().login)
+    })
+    const login  = ()=>{
+              if(infoLogin.nom !== "" && infoLogin.mdp !== ""){
+                axios.post(serverInfo+"/login",infoLogin,{withCredentials:true}).then(response=>{
+                  if(response.data.message !== "OK"){
+                    alert(response.data)
+                  }else{
+                    LogInStore.dispatch({type:"MAJ",login:true});
+                    setshowModalConnection(false)
+                  }
+                  setinfoLogin({})
+                  setisValidLogin(true)
+                })
+              }else{
+               setisValidLogin(false)
+             }
+    }
+
+    const inscription = ()=>{
+        if(infoInscription.nom !== "" && infoInscription.mdp !== ""){
+          axios.post(serverInfo+"/addUser",infoInscription).then(response=>{
+            setisValidInscription(true)
+            setmodalInscription(false)
+            setinfoInscription({})
+            console.log(response.data)
+          })
+        }else{
+          setisValidInscription(false)
+        }
+    }
     return (
         <div className="shadow">
            <Modal show={modalInscription} onHide={()=>setmodalInscription(false)}>
@@ -17,24 +78,26 @@ function Nav() {
                     <Form>
                       <Form.Group controlId="formBasicEmail">
                         <Form.Label>Nom d'utilisateur</Form.Label>
-                        <Form.Control placeholder="Entrer le nom d'utilisateur" />
+                          <Form.Control onChange={(e)=>handleInscription("nom",e.target.value)} type="text" placeholder="Entrer le nom d'utilisateur" />
                         <Form.Text className="text-muted">
                         </Form.Text>
                       </Form.Group>
 
                       <Form.Group controlId="formBasicPassword">
                         <Form.Label>Mot de passe</Form.Label>
-                        <Form.Control type="password" placeholder="Mot de passe" />
+                          <Form.Control onChange={(e)=>handleInscription("mdp",e.target.value)} type="password" placeholder="Mot de passe" />
                       </Form.Group>
                     </Form>
-                    <p className="text-danger">Veuillez remplir tous les champs!</p>
+                    {
+                      !isValidInscription &&  <p className="text-danger">Veuillez remplir tous les champs!</p>
+                    }
                     </Modal.Body>
                     <Modal.Footer>
                     <Button variant="secondary" onClick={()=>setmodalInscription(false)}>
                         Annuler
                     </Button>
 
-                    <Button variant="primary" onClick={()=>setmodalInscription(false)}>
+                    <Button variant="primary" onClick={inscription}>
                         S'inscrire
                     </Button>
                     </Modal.Footer>
@@ -48,24 +111,26 @@ function Nav() {
                     <Form>
                       <Form.Group controlId="formBasicEmail">
                         <Form.Label>Nom d'utilisateur</Form.Label>
-                        <Form.Control placeholder="Entrer le nom d'utilisateur" />
+                        <Form.Control onChange={(e)=>handleLogin("nom",e.target.value)} placeholder="Entrer le nom d'utilisateur" />
                         <Form.Text className="text-muted">
                         </Form.Text>
                       </Form.Group>
 
                       <Form.Group controlId="formBasicPassword">
                         <Form.Label>Mot de passe</Form.Label>
-                        <Form.Control type="password" placeholder="Mot de passe" />
+                        <Form.Control onChange={(e)=>handleLogin("mdp",e.target.value)} type="password" placeholder="Mot de passe" />
                       </Form.Group>
                     </Form>
-                    <p className="text-danger">Veuillez remplir tous les champs!</p>
+                    {
+                      !isValidLogin &&  <p className="text-danger">Veuillez remplir tous les champs!</p>
+                    }
                     </Modal.Body>
                     <Modal.Footer>
                     <Button variant="secondary" onClick={()=>setshowModalConnection(false)}>
                         Annuler
                     </Button>
 
-                    <Button variant="primary" onClick={()=>setshowModalConnection(false)}>
+                    <Button variant="primary" onClick={login}>
                         S'inscrire
                     </Button>
                     </Modal.Footer>
@@ -80,7 +145,7 @@ function Nav() {
                         Annuler
                     </Button>
 
-                    <Button variant="danger" onClick={()=>setshowDeconnect(false)}>
+                    <Button variant="danger" onClick={disconnect}>
                         Se déconnecter
                     </Button>
                     </Modal.Footer>
@@ -93,15 +158,33 @@ function Nav() {
                   <span className="text-white ml-2">Melchimael Randriamiadana</span>
                 </div>
                 <div>
-                  <Button variant="danger" onClick={()=>setshowDeconnect(true)}>
+                <Button variant="danger" onClick={()=>{
+                  console.log(LogInStore.getState().login) 
+                  // axios.post(serverInfo+"/cookietest",{},{withCredentials:true}).then(response=>{
+                  //     console.log(response.data)
+                  // })
+                }}>
                       <Icon.GearFill className="mr-1" color="#fff"/>
-                        Se déconnecter
+                        cookie test
                   </Button>
-                  <Button onClick={()=>setmodalInscription(true)} variant="success" className="ml-2">Inscription</Button>
                   
-                  <Button onClick={()=>setshowModalConnection(true)} variant="info" className="ml-2">Se connecter 
-                  <Icon.BoxArrowInLeft className="ml-2"/>
-                  </Button>
+                  {
+                      loginState && 
+                      <Button variant="danger" onClick={()=>setshowDeconnect(true)}>
+                          <Icon.GearFill className="mr-1" color="#fff"/>
+                            Se déconnecter
+                      </Button>
+                    }
+                   {
+                      !loginState && 
+                      <Button onClick={()=>setmodalInscription(true)} variant="success" className="ml-2">Inscription</Button>
+                      }
+                  {
+                      !loginState && 
+                      <Button onClick={()=>setshowModalConnection(true)} variant="info" className="ml-2">Se connecter 
+                      <Icon.BoxArrowInLeft className="ml-2"/>
+                      </Button>
+                      }
                 </div>
               </Col>
             </Row>
