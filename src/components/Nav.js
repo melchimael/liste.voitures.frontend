@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import {Button, Row, Col, Container, Modal, Form} from "react-bootstrap"
+import React, { useEffect, useState } from 'react'
+import {Button, Row, Col, Container, Modal, Form, Spinner} from "react-bootstrap"
 import * as Icon from 'react-bootstrap-icons';
 import './Styles/Nav.css'
 import axios from 'axios'
@@ -28,8 +28,10 @@ function Nav() {
     }
 
     const disconnect = ()=>{
+        setisLoading(true)
         LogInStore.dispatch({type:"MAJ",login:false});
         axios.post(serverInfo+"/disconnect",{},{withCredentials:true}).then(response=>{
+          setisLoading(false)
               alert(response.data)
               setshowDeconnect(false)
         })
@@ -40,35 +42,58 @@ function Nav() {
     })
     const login  = ()=>{
               if(infoLogin.nom !== "" && infoLogin.mdp !== ""){
+                setisLoading(true)
                 axios.post(serverInfo+"/login",infoLogin,{withCredentials:true}).then(response=>{
+                  setisLoading(false)
                   if(response.data.message !== "OK"){
                     alert(response.data)
                   }else{
                     LogInStore.dispatch({type:"MAJ",login:true});
                     setshowModalConnection(false)
+                    setinfoLogin({})
                   }
-                  setinfoLogin({})
                   setisValidLogin(true)
                 })
               }else{
-               setisValidLogin(false)
+                setisValidLogin(false)
              }
     }
-
+    const [isLoading, setisLoading] = useState(false)
     const inscription = ()=>{
         if(infoInscription.nom !== "" && infoInscription.mdp !== ""){
+          setisLoading(true)
           axios.post(serverInfo+"/addUser",infoInscription).then(response=>{
             setisValidInscription(true)
             setmodalInscription(false)
             setinfoInscription({})
-            console.log(response.data)
+            setisLoading(false)
+            alert("veuillez vous connecter")
           })
         }else{
+          setisLoading(false)
           setisValidInscription(false)
         }
     }
+    const [infoUser, setinfoUser] = useState({})
+    const getInfouser = ()=>{ 
+      axios.post(serverInfo+"/getInfoUser",{},{withCredentials:true}).then(response=>{
+      setinfoUser(response.data)
+      // console.log(response.data)
+    })
+    }
+    useEffect(()=>{
+       getInfouser()
+    },[loginState])
     return (
         <div className="shadow">
+           <Modal show={isLoading}>
+             <div className="d-flex justify-content-center p-5">
+                  <Spinner animation="grow" variant="warning" />
+                  <Spinner animation="grow" variant="info" />
+                  <Spinner animation="grow" variant="danger" />
+                  <Spinner animation="grow" variant="dark" />
+               </div>
+          </Modal>
            <Modal show={modalInscription} onHide={()=>setmodalInscription(false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>S'inscrire</Modal.Title>
@@ -131,7 +156,7 @@ function Nav() {
                     </Button>
 
                     <Button variant="primary" onClick={login}>
-                        S'inscrire
+                        Se connecter
                     </Button>
                     </Modal.Footer>
           </Modal>
@@ -154,11 +179,13 @@ function Nav() {
             <Row>
               <Col className="navigation bg-dark shadow p-3 mb-5 bg-body">
                 <div className="d-flex align-items-center">
-                  <Icon.PersonCircle color="#fff" size={25}/>
-                  <span className="text-white ml-2">Melchimael Randriamiadana</span>
+                  
+                  {
+                      loginState && <div><Icon.PersonCircle color="#fff" size={25}/><span className="text-white ml-2">{infoUser.nom}</span></div> 
+                  }
                 </div>
                 <div>
-                <Button variant="danger" onClick={()=>{
+                {/* <Button variant="danger" onClick={()=>{
                   console.log(LogInStore.getState().login) 
                   // axios.post(serverInfo+"/cookietest",{},{withCredentials:true}).then(response=>{
                   //     console.log(response.data)
@@ -166,7 +193,7 @@ function Nav() {
                 }}>
                       <Icon.GearFill className="mr-1" color="#fff"/>
                         cookie test
-                  </Button>
+                  </Button> */}
                   
                   {
                       loginState && 
@@ -177,7 +204,8 @@ function Nav() {
                     }
                    {
                       !loginState && 
-                      <Button onClick={()=>setmodalInscription(true)} variant="success" className="ml-2">Inscription</Button>
+                      <Button onClick={()=>setmodalInscription(true)} variant="success" className="ml-2">Inscription
+                      </Button>
                       }
                   {
                       !loginState && 
