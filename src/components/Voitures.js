@@ -56,7 +56,7 @@ const Voitures = ({item})=>{
     }
     const [comments, setcomments] = useState([])
     const getComment = ()=>{
-        if(loginState==true){
+        if(loginState){
             // console.log(item._id)
             axios.post(serverInfo+'/getComments',{voitureId:item._id}).then(response=>{
                 setcomments(response.data)
