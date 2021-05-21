@@ -1,11 +1,10 @@
-# liste.voitures.backend
- Backend liste voitures (Node.js + Express)
+# Liste.voitures.Frontend 
+Frontend Liste voitures (React + Redux)
 
-# Configuration : 
-Port : index.js> const port
+# Configuration 
+Lien vers l'API : src>components>config>serverInfo.js 
+(lien sécurisé seulement) 
+ 
+# Specs 
+Commentaire en temps-réel avec socket.io 
 
-# Specs
-Authentification avec JSON Web Token + Secure Cookie + Hash Password 
-Sans Refresh token.
-
-Système de commentaire en Real-time avec Socket.io  
